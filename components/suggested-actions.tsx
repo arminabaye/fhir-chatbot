@@ -14,23 +14,23 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
       title: 'What are my clinical notes',
-      label: 'from my last visit',
+      label: 'from my last visit?',
       action: 'What are my clinical notes from my last visit?',
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'What medications were prescribed',
+      label: `by my clinician?`,
+      action: `What were the medications prescribed by the clinician?`,
     },
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'What have I been diagnosed with',
+      label: `that I should be keeping track of?`,
+      action: `What have I been diagnosed with that I should be keeping track of?`,
     },
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: 'What are my action items',
+      label: 'from my last visit?',
+      action: 'What are my action items before my next appointment?',
     },
   ];
 
