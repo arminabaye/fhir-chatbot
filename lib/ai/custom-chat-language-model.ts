@@ -68,6 +68,7 @@ import {
           .join('\n'),
       };
       console.log('Making request to /query');
+      console.log(this.config);
   
       const { responseHeaders, value: response, rawValue } =
         await postJsonToApi({
