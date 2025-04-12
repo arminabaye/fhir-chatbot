@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(), // if it defaults internally
+          model: myProvider.languageModel('default'), // if it defaults internally
           system: systemPrompt(),
           experimental_activeTools: [
             'getWeather',
