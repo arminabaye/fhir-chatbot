@@ -15,13 +15,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function PureChatHeader({
   chatId,
-  selectedModelId,
-  selectedVisibilityType,
   isReadonly,
 }: {
   chatId: string;
-  selectedModelId: string;
-  selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
   const router = useRouter();
@@ -58,5 +54,6 @@ function PureChatHeader({
 }
 
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
-  return prevProps.selectedModelId === nextProps.selectedModelId;
+  return prevProps.chatId === nextProps.chatId;
 });
+
