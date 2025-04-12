@@ -33,12 +33,11 @@ export async function POST(request: Request) {
     const {
       id,
       messages,
-      selectedChatModel,
     }: {
       id: string;
       messages: Array<UIMessage>;
-      selectedChatModel: string;
     } = await request.json();
+
 
     const session = await auth();
 
@@ -82,19 +81,15 @@ export async function POST(request: Request) {
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
-          messages,
-          maxSteps: 5,
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
+          model: myProvider.languageModel(), // if it defaults internally
+          system: systemPrompt(),
+          experimental_activeTools: [
+            'getWeather',
+            'createDocument',
+            'updateDocument',
+            'requestSuggestions',
+          ],
+
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
           tools: {
@@ -116,8 +111,10 @@ export async function POST(request: Request) {
                 });
 
                 if (!assistantId) {
-                  throw new Error('No assistant message found!');
+                  console.warn('No assistant message found — skipping save.');
+                  return;
                 }
+
 
                 const [, assistantMessage] = appendResponseMessages({
                   messages: [userMessage],
