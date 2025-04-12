@@ -15,13 +15,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function PureChatHeader({
   chatId,
-  selectedModelId,
-  selectedVisibilityType,
   isReadonly,
 }: {
   chatId: string;
-  selectedModelId: string;
-  selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
   const router = useRouter();
