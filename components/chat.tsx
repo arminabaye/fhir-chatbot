@@ -46,9 +46,13 @@ export function Chat({
       mutate('/api/history');
     },
     onError: (error) => {
-      console.error('Chat error:', error);
-      toast.error('An error occured, please try again!');
-    },
+      console.warn('Handled chat error:', error?.message);
+      // Optional: only show a toast if it's a real system error
+      if (error?.message && !error.message.includes("I'm sorry")) {
+        toast.error('Something went wrong. Please try again.');
+      }
+    }
+
   });
 
   const { data: votes } = useSWR<Array<Vote>>(
