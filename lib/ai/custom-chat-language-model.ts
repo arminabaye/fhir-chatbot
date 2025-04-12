@@ -67,6 +67,8 @@ import {
           .map((m) => m.content)
           .join('\n'),
       };
+      console.log('Making request to /query');
+      console.log(this.config);
   
       const { responseHeaders, value: response, rawValue } =
         await postJsonToApi({
@@ -80,7 +82,9 @@ import {
           fetch: this.config.fetch,
           abortSignal: options.abortSignal,
         });
-  
+
+        console.log('Got response back from /query');
+        console.log(response.payload.message);
       return {
         text: response.payload.message,
         finishReason: 'stop',
