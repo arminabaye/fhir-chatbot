@@ -151,9 +151,15 @@ export async function POST(request: Request) {
           sendReasoning: true,
         });
       },
-      onError: () => {
-        return 'Oops, an error occured!';
-      },
+      onError: (_, dataStream) => {
+        dataStream.writeMessage({
+          role: 'assistant',
+          content: "I'm sorry, I wasn't able to process that request. Could you please try rephrasing it?",
+        });
+
+        dataStream.close(); // very important
+      }
+
     });
   } catch (error) {
     console.log(error);
