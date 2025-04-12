@@ -68,12 +68,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   return (
     <>
       <Chat
-        id={chat.id}
-        initialMessages={convertToUIMessages(messagesFromDb)}
-        selectedChatModel={chatModelFromCookie.value}
-        selectedVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
+          id={chat.id}
+          initialMessages={convertToUIMessages(messagesFromDb)}
+          isReadonly={session?.user?.id !== chat.userId}
       />
+
       <DataStreamHandler id={id} />
     </>
   );
