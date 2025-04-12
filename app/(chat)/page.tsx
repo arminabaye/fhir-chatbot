@@ -30,8 +30,6 @@ export default async function Page() {
         key={id}
         id={id}
         initialMessages={[]}
-        selectedChatModel={modelIdFromCookie.value}
-        selectedVisibilityType="private"
         isReadonly={false}
       />
       <DataStreamHandler id={id} />
