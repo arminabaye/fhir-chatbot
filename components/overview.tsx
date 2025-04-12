@@ -20,10 +20,10 @@ export const Overview = () => {
           <MessageIcon size={32} />
         </p>
         <p>
-          This is an{' '}
+          This is a{' '}
           <Link
             className="font-medium underline underline-offset-4"
-            href="https://github.com/vercel/ai-chatbot"
+            href="https://github.gatech.edu/cs6440-spring2025-team31/practicum"
             target="_blank"
           >
             medical record
