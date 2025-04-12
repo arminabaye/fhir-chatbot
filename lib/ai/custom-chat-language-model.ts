@@ -83,8 +83,16 @@ import {
           abortSignal: options.abortSignal,
         });
 
-        console.log('Got response back from /query');
-        console.log(response.payload.message);
+      console.log('🟢 Raw response from backend:');
+      console.dir(response, { depth: null });
+
+      if (
+          typeof response.payload.message !== 'string' ||
+          response.payload.message.includes("I'm sorry, but it seems like the question you provided is not clear")
+      ) {
+        console.warn("⚠️ Backend returned fallback or invalid format.");
+      }
+
       return {
         text: response.payload.message,
         finishReason: 'stop',
