@@ -1,83 +1,123 @@
 import {
-  ChatLanguageModel,
-  ProviderOptions,
-  StreamingTextResponse,
-} from '@ai-sdk/provider';
-import type { CoreMessage, Streamable, ApiResponse } from '@ai-sdk/provider';
-
-export class CustomChatLanguageModel extends ChatLanguageModel {
-  specificationVersion = 'v1';
-  provider = 'patient-ai-provider';
-  modelId: string;
-  defaultObjectGenerationMode = 'json';
-
-  constructor(
-    modelId: string,
-    settings: any,
-    options: ProviderOptions
-  ) {
-    super(modelId, settings, options);
-    this.modelId = modelId;
+    LanguageModelV1,
+    LanguageModelV1CallOptions,
+    LanguageModelV1StreamPart,
+    LanguageModelV1FinishReason,
+  } from '@ai-sdk/provider';
+  import {
+    combineHeaders,
+    postJsonToApi,
+    createJsonResponseHandler,
+  } from '@ai-sdk/provider-utils';
+  import { z } from 'zod';
+  
+  const chatResponseSchema = z.object({
+    metadata: z.record(z.any()),
+    payload: z.object({
+      message: z.string(),
+    }),
+    suggestedQueries: z.array(z.string()).optional(),
+  });
+  type ChatResponse = z.infer<typeof chatResponseSchema>;
+  
+  export interface ProviderConfig {
+    provider: string;
+    baseURL: string;
+    headers: () => Record<string, string>;
+    fetch?: typeof fetch;
   }
-
-  async doGenerate(
-    messages: CoreMessage[],
-    abortSignal: AbortSignal
-  ) {
-    const userText = messages
-      .filter((m) => m.role === 'user')
-      .map((m) => m.content)
-      .join('\n');
-
-    const res = await fetch(
-      `${this.options.baseURL}/query`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...this.options.headers(),
+  
+  export interface CustomChatSettings {
+    sessionId: string;
+  }
+  
+  export class CustomChatLanguageModel implements LanguageModelV1 {
+    readonly specificationVersion = 'v1';
+    readonly defaultObjectGenerationMode = 'json';
+    readonly provider: string;
+    readonly modelId: string;
+    readonly settings: CustomChatSettings;
+    private readonly config: ProviderConfig;
+  
+    constructor(
+      modelId: string,
+      settings: CustomChatSettings,
+      config: ProviderConfig
+    ) {
+      this.modelId = modelId;
+      this.settings = settings;
+      this.config = config;
+      this.provider = config.provider;
+    }
+  
+    async doGenerate(
+      options: LanguageModelV1CallOptions
+    ): Promise<{
+      text?: string;
+      finishReason: LanguageModelV1FinishReason;
+      usage: { promptTokens: number; completionTokens: number };
+      rawCall: { rawPrompt: unknown; rawSettings: Record<string, unknown> };
+      rawResponse?: { headers?: Record<string, string>; body?: unknown };
+    }> {
+      const body = {
+        metadata: { sessionId: this.settings.sessionId },
+        userContext: {},
+        payload: options.prompt
+          .filter((m) => m.role === 'user')
+          .map((m) => m.content)
+          .join('\n'),
+      };
+  
+      const { responseHeaders, value: response, rawValue } =
+        await postJsonToApi({
+          url: `${this.config.baseURL}/query`,
+          headers: combineHeaders(this.config.headers(), options.headers),
+          body,
+          successfulResponseHandler: createJsonResponseHandler(chatResponseSchema),
+          failedResponseHandler: (res) => {
+            throw new Error(`Upstream error: ${res.response.status}`);
+          },
+          fetch: this.config.fetch,
+          abortSignal: options.abortSignal,
+        });
+  
+      return {
+        text: response.payload.message,
+        finishReason: 'stop',
+        usage: { promptTokens: 0, completionTokens: 0 },
+        rawCall: {
+          rawPrompt: options.prompt,
+          rawSettings: (({ prompt, ...rest }) => rest)(options) as Record<string, unknown>,
         },
-        body: JSON.stringify({
-          metadata: { sessionId: this.settings.sessionId },
-          userContext: {},
-          payload: userText,
+        rawResponse: { headers: responseHeaders, body: rawValue },
+      };
+    }
+  
+    async doStream(
+      options: LanguageModelV1CallOptions
+    ): Promise<{
+      stream: ReadableStream<LanguageModelV1StreamPart>;
+      rawCall: { rawPrompt: unknown; rawSettings: Record<string, unknown> };
+    }> {
+      const result = await this.doGenerate(options);
+      const { text, finishReason, usage } = result;
+  
+      return {
+        rawCall: result.rawCall,
+        stream: new ReadableStream<LanguageModelV1StreamPart>({
+          start(controller) {
+            // 1) metadata
+            controller.enqueue({ type: 'response-metadata' });
+            // 2) text chunk
+            if (text) {
+              controller.enqueue({ type: 'text-delta', textDelta: text });
+            }
+            // 3) finish
+            controller.enqueue({ type: 'finish', finishReason, usage });
+            controller.close();
+          },
         }),
-        signal: abortSignal,
-      }
-    );
-
-    const data: ApiResponse = await res.json();
-    return {
-      text: data.payload.message,
-      parts: [{ type: 'text', text: data.payload.message }],
-      metadata: data.metadata,
-    };
+      };
+    }
   }
-
-  doStream(
-    messages: CoreMessage[],
-    abortSignal: AbortSignal
-  ): Streamable {
-    const stream = fetch(
-      `${this.options.baseURL}/query`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...this.options.headers(),
-        },
-        body: JSON.stringify({
-          metadata: { sessionId: this.settings.sessionId },
-          userContext: {},
-          payload: messages
-            .filter((m) => m.role === 'user')
-            .map((m) => m.content)
-            .join('\n'),
-        }),
-        signal: abortSignal,
-      }
-    ).then((r) => r.body!);
-
-    return new StreamingTextResponse(stream);
-  }
-}
+  

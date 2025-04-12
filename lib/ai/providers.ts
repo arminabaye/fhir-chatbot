@@ -25,10 +25,10 @@ export const myProvider = isTestEnvironment
     })
     : customProvider({
       languageModels: {
-        'chat-model':       patientProvider('patient-model'),
+        'chat-model':       patientProvider('patient-model', {sessionId: '1234'}), // TODO: fetch session id from launch
         'chat-model-reasoning':
-                             patientProvider('patient-model'),
-        'title-model':      patientProvider('patient-model'),
-        'artifact-model':   patientProvider('patient-model'),
+                             patientProvider('patient-model', {sessionId: '1234'}),
+        'title-model':      patientProvider('patient-model', {sessionId: '1234'}),
+        'artifact-model':   patientProvider('patient-model', {sessionId: '1234'}),
       },
     });
