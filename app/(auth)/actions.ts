@@ -35,18 +35,9 @@ export const login = async (
     });
     console.log('did sign in, now going to do launch');
 
-    const session = await auth();
-    console.log('got session')
-    console.dir(session)
-    if (!session?.user?.id) {
-      return { status: 'failed' };
-    }
-    let patientId = session.user.id;
-    if (session.user.email) {
-      patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email] ?? patientId;
-    }
+    const patientId = EMAIL_TO_PATIENT_ID_MAPPING[validatedData.email] ?? "";
 
-    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id});
+    const launchRes = await postLaunch({patientId: patientId, sessionId: ""});
 
     return { status: 'success' };
   } catch (error) {
@@ -94,12 +85,9 @@ export const register = async (
     if (!session?.user?.id) {
       return { status: 'failed' };
     }
-    let patientId = session.user.id;
-    if (session.user.email) {
-      patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email] ?? patientId;
-    }
 
-    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id});
+    const patientId = EMAIL_TO_PATIENT_ID_MAPPING[validatedData.email] ?? "";
+    const launchRes = await postLaunch({patientId: patientId, sessionId: ""});
 
     return { status: 'success' };
   } catch (error) {
