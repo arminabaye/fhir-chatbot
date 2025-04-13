@@ -10,6 +10,8 @@ import {
 } from '@/lib/db/queries';
 import { VisibilityType } from '@/components/visibility-selector';
 import { myProvider } from '@/lib/ai/providers';
+import { isTestEnvironment } from '@/lib/constants';
+import { patientProvider } from '@/lib/ai/patient-provider';
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
@@ -18,11 +20,16 @@ export async function saveChatModelAsCookie(model: string) {
 
 export async function generateTitleFromUserMessage({
   message,
+  patientId,
+  sessionId,
 }: {
   message: Message;
+  patientId: string,
+  sessionId: string,
 }) {
+  const model = isTestEnvironment ? myProvider.languageModel('title-model') : patientProvider('patient-model', {sessionId: sessionId, patientId})
   const { text: title } = await generateText({
-    model: myProvider.languageModel('title-model'),
+    model: model,
     system: `\n
     - you will generate a short title based on the first message a user begins a conversation with
     - ensure it is not more than 80 characters long

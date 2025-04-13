@@ -65,6 +65,8 @@ export async function POST(request: Request) {
     if (!chat) {
       const title = await generateTitleFromUserMessage({
         message: userMessage,
+        patientId: patientId,
+        sessionId: session.user?.id
       });
 
       await saveChat({ id, userId: session.user.id, title });
@@ -87,14 +89,18 @@ export async function POST(request: Request) {
       ],
     });
 
+    console.log('Setting patientId')
+    console.log(patientId)
+    console.log('sessionId')
+    console.log(session.user?.id)
     const model = isTestEnvironment ? myProvider.languageModel(selectedChatModel) : patientProvider('patient-model', {sessionId: session.user?.id, patientId})
+    console.log(model.modelId)
 
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
           model,
           system: systemPrompt({ selectedChatModel }),
-          headers: { 'patientId': patientId },
           messages,
           maxSteps: 5,
           experimental_activeTools:
