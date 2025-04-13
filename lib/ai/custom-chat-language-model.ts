@@ -32,6 +32,7 @@ import {
   
   export interface CustomChatSettings {
     sessionId: string;
+    patientId?: string;
   }
 
   function isTextPart(
@@ -92,7 +93,6 @@ import {
         .join('\n'),
       };
       console.log('Making request to /query');
-      console.log(this.config);
       const headers = combineHeaders(this.config.headers(), options.headers);
       console.log('Headers');
       console.log(headers);

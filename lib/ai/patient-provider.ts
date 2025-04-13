@@ -24,7 +24,12 @@ export function createCustomProvider(
     new CustomChatLanguageModel(modelId, settings, {
       provider: 'patient-ai-provider',
       baseURL: withoutTrailingSlash(options.baseURL) ?? 'http://52.23.217.141',
-      headers: () => options.headers ?? {},
+      headers: () => {
+        const base = options.headers ?? {};
+        return settings.patientId
+          ? { ...base, 'patientId': settings.patientId }
+          : base;
+      },
       fetch: fetch,
     } as ProviderConfig);
 
