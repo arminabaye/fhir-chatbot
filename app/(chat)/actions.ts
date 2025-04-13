@@ -63,26 +63,41 @@ export async function updateChatVisibility({
 export async function postLaunch({patientId,  sessionId}:{ patientId: string, sessionId: string}) {
   console.log('POSTing to /launch')
   console.log(patientId)
-  console.log(sessionId)
-  const launchRes = await fetch(
-    'http://52.23.217.141/launch',
-    {
+
+  const controller = new AbortController();
+  const timeoutMs = 2 * 60_000;
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
+
+  try {
+    const launchRes = await fetch('http://52.23.217.141/launch', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'patientId': patientId,
+        patientId,
       },
       body: JSON.stringify({
-        metadata: { sessionId: sessionId },
+        metadata: { sessionId },
         userContext: {},
       }),
-    }
-  );
-  console.log('Got response from launch', launchRes.status)
+      signal: controller.signal,
+    });
 
-  if (!launchRes.ok) {
-    console.error('Launch failed:', await launchRes.text());
-  } else {
-    console.log('Launch success', await launchRes.json())
+    console.log('Got response from launch', launchRes.status);
+
+    if (!launchRes.ok) {
+      console.error('Launch failed:', await launchRes.text());
+    } else {
+      console.log('Launch success', await launchRes.json());
+    }
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      console.error(`Launch request aborted after ${timeoutMs}ms`);
+    } else {
+      console.error('Launch request error:', err);
+    }
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
