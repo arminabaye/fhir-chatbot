@@ -91,6 +91,7 @@ export async function POST(request: Request) {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
           system: systemPrompt({ selectedChatModel }),
+          headers: { 'patientId': patientId },
           messages,
           maxSteps: 5,
           experimental_activeTools:
@@ -163,7 +164,6 @@ export async function POST(request: Request) {
           sendReasoning: true,
         });
       },
-      headers: {patientId: patientId},
       onError: () => {
         return 'Oops, an error occured!';
       },
