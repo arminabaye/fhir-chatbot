@@ -3,6 +3,9 @@ import {
     LanguageModelV1CallOptions,
     LanguageModelV1StreamPart,
     LanguageModelV1FinishReason,
+    LanguageModelV1TextPart,
+    LanguageModelV1ImagePart,
+    LanguageModelV1FilePart,
   } from '@ai-sdk/provider';
   import {
     combineHeaders,
@@ -30,6 +33,12 @@ import {
   export interface CustomChatSettings {
     sessionId: string;
   }
+
+  function isTextPart(
+    part: LanguageModelV1TextPart | LanguageModelV1ImagePart | LanguageModelV1FilePart
+  ): part is LanguageModelV1TextPart {
+    return part.type === 'text';
+  }
   
   export class CustomChatLanguageModel implements LanguageModelV1 {
     readonly specificationVersion = 'v1';
@@ -49,6 +58,7 @@ import {
       this.config = config;
       this.provider = config.provider;
     }
+    
   
     async doGenerate(
       options: LanguageModelV1CallOptions
@@ -64,9 +74,22 @@ import {
         metadata: { sessionId: this.settings.sessionId },
         userContext: {},
         payload: options.prompt
-          .filter((m) => m.role === 'user')
-          .map((m) => m.content)
-          .join('\n'),
+        .filter(m => m.role === 'user')
+        .map(m => {
+          // if content is already a string, just return it
+          if (typeof m.content === 'string') {
+            return m.content;
+          }
+
+          if (Array.isArray(m.content)) {
+            return m.content
+              .filter(isTextPart)
+              .map(part => part.text) 
+              .join('');
+          }
+          return JSON.stringify(m.content);
+        })
+        .join('\n'),
       };
       console.log('Making request to /query');
       console.log(this.config);
