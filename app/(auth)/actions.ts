@@ -39,7 +39,7 @@ export const login = async (
 
     const patientId = EMAIL_TO_PATIENT_ID_MAPPING[validatedData.email] ?? "";
 
-    const launchRes = await postLaunch({patientId: patientId, sessionId: ""});
+    postLaunch({patientId: patientId, sessionId: ""}); // fire and forget
 
     return { status: 'success' };
   } catch (error) {
@@ -89,7 +89,7 @@ export const register = async (
     }
 
     const patientId = EMAIL_TO_PATIENT_ID_MAPPING[validatedData.email] ?? "";
-    const launchRes = await postLaunch({patientId: patientId, sessionId: ""});
+    postLaunch({patientId: patientId, sessionId: ""}); // fire and forget
 
     return { status: 'success' };
   } catch (error) {

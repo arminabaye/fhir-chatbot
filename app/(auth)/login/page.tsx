@@ -10,6 +10,10 @@ import { SubmitButton } from '@/components/submit-button';
 
 import { login, type LoginActionState } from '../actions';
 
+export const config = {
+  maxDuration: 60,
+};
+
 export default function Page() {
   const router = useRouter();
 
@@ -23,7 +27,6 @@ export default function Page() {
       status: 'idle',
     },
   );
-  console.log('login complete');
   console.dir(state);
 
 
