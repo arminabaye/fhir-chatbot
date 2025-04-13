@@ -59,3 +59,30 @@ export async function updateChatVisibility({
 }) {
   await updateChatVisiblityById({ chatId, visibility });
 }
+
+export async function postLaunch({patientId,  sessionId}:{ patientId: string, sessionId: string}) {
+  console.log('POSTing to /launch')
+  console.log(patientId)
+  console.log(sessionId)
+  const launchRes = await fetch(
+    'http://52.23.217.141/launch',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'patientId': patientId,
+      },
+      body: JSON.stringify({
+        metadata: { sessionId: sessionId },
+        userContext: {},
+      }),
+    }
+  );
+  console.log('Got response from launch', launchRes.status)
+
+  if (!launchRes.ok) {
+    console.error('Launch failed:', await launchRes.text());
+  } else {
+    console.log('Launch success', await launchRes.json())
+  }
+}

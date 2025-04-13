@@ -4,7 +4,10 @@ import { z } from 'zod';
 
 import { createUser, getUser } from '@/lib/db/queries';
 
-import { signIn } from './auth';
+import { auth, signIn } from './auth';
+import getServerSession from 'next-auth';
+import { EMAIL_TO_PATIENT_ID_MAPPING } from '@/lib/constants';
+import { postLaunch } from '../(chat)/actions';
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -30,6 +33,17 @@ export const login = async (
       password: validatedData.password,
       redirect: false,
     });
+
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { status: 'failed' };
+    }
+    let patientId = session.user.id;
+    if (session.user.email) {
+      patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email] ?? patientId;
+    }
+
+    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id})
 
     return { status: 'success' };
   } catch (error) {
@@ -72,6 +86,17 @@ export const register = async (
       password: validatedData.password,
       redirect: false,
     });
+
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { status: 'failed' };
+    }
+    let patientId = session.user.id;
+    if (session.user.email) {
+      patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email] ?? patientId;
+    }
+
+    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id})
 
     return { status: 'success' };
   } catch (error) {
