@@ -19,7 +19,6 @@ export interface LoginActionState {
   status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
 }
 
-export const maxDuration = 60;
 
 export const login = async (
   _: LoginActionState,
