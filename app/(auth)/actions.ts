@@ -33,6 +33,7 @@ export const login = async (
       password: validatedData.password,
       redirect: false,
     });
+    console.log('did sign in, now going to do launch');
 
     const session = await auth();
     if (!session?.user?.id) {
@@ -43,7 +44,7 @@ export const login = async (
       patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email] ?? patientId;
     }
 
-    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id})
+    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id});
 
     return { status: 'success' };
   } catch (error) {
@@ -96,7 +97,7 @@ export const register = async (
       patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email] ?? patientId;
     }
 
-    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id})
+    const launchRes = await postLaunch({patientId: patientId, sessionId: session.user?.id});
 
     return { status: 'success' };
   } catch (error) {

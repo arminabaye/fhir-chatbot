@@ -16,12 +16,16 @@ export default function Page() {
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
 
+  console.log('running login');
   const [state, formAction] = useActionState<LoginActionState, FormData>(
     login,
     {
       status: 'idle',
     },
   );
+  console.log('login complete');
+  console.dir(state);
+
 
   useEffect(() => {
     if (state.status === 'failed') {
