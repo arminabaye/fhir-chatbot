@@ -23,7 +23,7 @@ import { createDocument } from '@/lib/ai/tools/create-document';
 import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
-import { isProductionEnvironment } from '@/lib/constants';
+import { EMAIL_TO_PATIENT_ID_MAPPING, isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 
 export const maxDuration = 60;
@@ -45,6 +45,12 @@ export async function POST(request: Request) {
 
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
+    }
+
+
+    let patientId = session.user.id
+    if (session.user.email) {
+      patientId = EMAIL_TO_PATIENT_ID_MAPPING[session.user.email]
     }
 
     const userMessage = getMostRecentUserMessage(messages);
@@ -79,8 +85,6 @@ export async function POST(request: Request) {
         },
       ],
     });
-    console.log('have messages...');
-    console.log(messages);
 
     return createDataStreamResponse({
       execute: (dataStream) => {
@@ -159,6 +163,7 @@ export async function POST(request: Request) {
           sendReasoning: true,
         });
       },
+      headers: {patientId: patientId},
       onError: () => {
         return 'Oops, an error occured!';
       },

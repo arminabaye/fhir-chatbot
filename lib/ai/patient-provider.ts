@@ -36,6 +36,5 @@ export function createCustomProvider(
 
 export const patientProvider = createCustomProvider({
     baseURL: "http://52.23.217.141",
-    headers: { patientId: "example" }, // TODO get this from the user
   });
 
