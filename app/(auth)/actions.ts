@@ -9,6 +9,7 @@ import getServerSession from 'next-auth';
 import { EMAIL_TO_PATIENT_ID_MAPPING } from '@/lib/constants';
 import { postLaunch } from '../(chat)/actions';
 
+
 const authFormSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -17,6 +18,8 @@ const authFormSchema = z.object({
 export interface LoginActionState {
   status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
 }
+
+export const maxDuration = 60;
 
 export const login = async (
   _: LoginActionState,
