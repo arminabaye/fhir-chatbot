@@ -73,7 +73,7 @@ import {
       console.log('Headers');
       console.log(headers);
       console.log('Body');
-      console.log(body);
+      console.dir(body, { depth: null });
   
       const { responseHeaders, value: response, rawValue } =
         await postJsonToApi({
@@ -88,8 +88,8 @@ import {
           abortSignal: options.abortSignal,
         });
   
-      console.log('Got response back from /query');
-      console.log(response.payload.message);
+      console.log('🟢 Raw response from backend:');
+      console.dir(response, { depth: null });
       return {
         text: response.payload.message,
         finishReason: 'stop',
