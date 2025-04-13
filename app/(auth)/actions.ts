@@ -5,9 +5,8 @@ import { z } from 'zod';
 import { createUser, getUser } from '@/lib/db/queries';
 
 import { auth, signIn } from './auth';
-import getServerSession from 'next-auth';
 import { EMAIL_TO_PATIENT_ID_MAPPING } from '@/lib/constants';
-import { postLaunch } from '../(chat)/actions';
+import { postLaunch } from './utils';
 
 
 const authFormSchema = z.object({
