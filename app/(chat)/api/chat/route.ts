@@ -81,8 +81,8 @@ export async function POST(request: Request) {
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel('default'), // if it defaults internally
-          system: systemPrompt({ selectedChatModel: 'default' }),
+          model: myProvider.languageModel('chat-model'), // if it defaults internally
+          system: systemPrompt({ selectedChatModel: 'chat-model' }),
           experimental_activeTools: [
             'getWeather',
             'createDocument',
