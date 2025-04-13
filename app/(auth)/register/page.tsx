@@ -10,6 +10,10 @@ import { SubmitButton } from '@/components/submit-button';
 import { register, type RegisterActionState } from '../actions';
 import { toast } from '@/components/toast';
 
+export const config = {
+  maxDuration: 60,
+};
+
 export default function Page() {
   const router = useRouter();
 
