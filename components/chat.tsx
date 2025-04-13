@@ -13,15 +13,20 @@ import { Messages } from './messages';
 
 import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
+import { VisibilityType } from './visibility-selector';
 
 export function Chat({
   id,
   initialMessages,
   isReadonly,
+  selectedChatModel,
+  selectedVisibilityType,
 }: {
   id: string;
   initialMessages: Array<UIMessage>;
   isReadonly: boolean;
+  selectedChatModel: string;
+  selectedVisibilityType: VisibilityType;
 }) {
   const { mutate } = useSWRConfig();
 
@@ -37,7 +42,7 @@ export function Chat({
     reload,
   } = useChat({
     id,
-    body: { id },
+    body: { id, selectedChatModel: selectedChatModel },
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
