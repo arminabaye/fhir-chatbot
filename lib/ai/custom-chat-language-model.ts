@@ -70,10 +70,10 @@ import {
       console.log('Making request to /query');
       console.log(this.config);
       const headers = combineHeaders(this.config.headers(), options.headers);
-      console.log('Headers')
-      console.log(headers)
-      console.log('Body')
-      console.log(body)
+      console.log('Headers');
+      console.log(headers);
+      console.log('Body');
+      console.log(body);
   
       const { responseHeaders, value: response, rawValue } =
         await postJsonToApi({
