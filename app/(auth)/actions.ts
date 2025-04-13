@@ -36,6 +36,8 @@ export const login = async (
     console.log('did sign in, now going to do launch');
 
     const session = await auth();
+    console.log('got session')
+    console.dir(session)
     if (!session?.user?.id) {
       return { status: 'failed' };
     }
