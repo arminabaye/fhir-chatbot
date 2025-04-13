@@ -59,6 +59,7 @@ import {
       rawCall: { rawPrompt: unknown; rawSettings: Record<string, unknown> };
       rawResponse?: { headers?: Record<string, string>; body?: unknown };
     }> {
+      console.dir(options.prompt, { depth: null });
       const body = {
         metadata: { sessionId: this.settings.sessionId },
         userContext: {},
